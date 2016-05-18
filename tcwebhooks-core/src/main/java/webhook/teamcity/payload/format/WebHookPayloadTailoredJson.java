@@ -3,20 +3,11 @@
  */
 package webhook.teamcity.payload.format;
 
-import java.util.Collection;
-import java.util.SortedMap;
-
-import jetbrains.buildServer.responsibility.ResponsibilityEntry;
-import jetbrains.buildServer.responsibility.TestNameResponsibilityEntry;
-import jetbrains.buildServer.serverSide.SProject;
-import jetbrains.buildServer.tests.TestName;
+import webhook.teamcity.Loggers;
 import webhook.teamcity.payload.WebHookPayload;
 import webhook.teamcity.payload.WebHookPayloadManager;
 import webhook.teamcity.payload.content.WebHookPayloadContent;
-import webhook.teamcity.payload.convertor.ExtraParametersMapToJsonConvertor;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver;
+import webhook.teamcity.payload.content.WebHookPayloadContentAssemblyException;
 
 public class WebHookPayloadTailoredJson extends WebHookPayloadGeneric implements WebHookPayload {
 	
@@ -43,9 +34,12 @@ public class WebHookPayloadTailoredJson extends WebHookPayloadGeneric implements
 		return "Send a JSON payload with content specified by parameter named 'body'";
 	}
 	
-	protected String getStatusAsString(WebHookPayloadContent content){
-
-		return content.getExtraParameters().get("body");
+	protected String getStatusAsString(WebHookPayloadContent content) throws WebHookPayloadContentAssemblyException {
+		try {
+			return content.getExtraParameters().get("body");
+		} catch (NullPointerException npe){
+			throw new WebHookPayloadContentAssemblyException("Failure building message content :: Unable to retreive 'body' content.");
+		}
 
 	}
 

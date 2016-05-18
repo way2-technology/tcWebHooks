@@ -16,6 +16,8 @@ import jetbrains.buildServer.tests.TestName;
 
 import org.jetbrains.annotations.NotNull;
 
+import webhook.teamcity.payload.content.WebHookPayloadContentAssemblyException;
+
 public interface WebHookPayload {
 	
 	public final static String BUILD_STATUS_FAILURE   = "failure";
@@ -76,8 +78,9 @@ public interface WebHookPayload {
 	 * @param sRunningBuild
 	 * @param extraParameters
 	 * @return Formatted payload for the WebHook to send for the buildStarted event.
+	 * @throws WebHookPayloadContentAssemblyException 
 	 */
-    String buildStarted(SRunningBuild sRunningBuild, SFinishedBuild previousBuild, SortedMap<String,String> extraParameters, Map<String, String> templates);
+    String buildStarted(SRunningBuild sRunningBuild, SFinishedBuild previousBuild, SortedMap<String,String> extraParameters, Map<String, String> templates) throws WebHookPayloadContentAssemblyException;
 
     /**
 	 * Extracts the required information from the sRunningBuild and extraParameters configured in the webhook
@@ -86,8 +89,9 @@ public interface WebHookPayload {
 	 * @param sRunningBuild
 	 * @param extraParameters
 	 * @return Formatted payload for the WebHook to send for the buildFinished event.
+     * @throws WebHookPayloadContentAssemblyException 
 	 */
-    String buildFinished(SRunningBuild sRunningBuild, SFinishedBuild previousBuild, SortedMap<String,String> extraParameters, Map<String, String> templates);
+    String buildFinished(SRunningBuild sRunningBuild, SFinishedBuild previousBuild, SortedMap<String,String> extraParameters, Map<String, String> templates) throws WebHookPayloadContentAssemblyException;
 
     /**
 	 * Extracts the required information from the sRunningBuild and extraParameters configured in the webhook
@@ -96,8 +100,9 @@ public interface WebHookPayload {
 	 * @param sRunningBuild
 	 * @param extraParameters
 	 * @return Formatted payload for the WebHook to send for the buildInterrupted event.
+     * @throws WebHookPayloadContentAssemblyException 
 	 */
-    String buildInterrupted(SRunningBuild sRunningBuild, SFinishedBuild previousBuild, SortedMap<String,String> extraParameters, Map<String, String> templates);
+    String buildInterrupted(SRunningBuild sRunningBuild, SFinishedBuild previousBuild, SortedMap<String,String> extraParameters, Map<String, String> templates) throws WebHookPayloadContentAssemblyException;
 
     /**
 	 * Extracts the required information from the sRunningBuild and extraParameters configured in the webhook
@@ -106,8 +111,9 @@ public interface WebHookPayload {
 	 * @param sRunningBuild
 	 * @param extraParameters
 	 * @return Formatted payload for the WebHook to send for the beforeBuildFinish event.
+     * @throws WebHookPayloadContentAssemblyException 
 	 */
-    String beforeBuildFinish(SRunningBuild sRunningBuild, SFinishedBuild previousBuild, SortedMap<String,String> extraParameters, Map<String, String> templates);
+    String beforeBuildFinish(SRunningBuild sRunningBuild, SFinishedBuild previousBuild, SortedMap<String,String> extraParameters, Map<String, String> templates) throws WebHookPayloadContentAssemblyException;
     
 	/**
 	 * buildChangedStatus has been deprecated because it alluded to build history status, which was incorrect.
@@ -128,11 +134,12 @@ public interface WebHookPayload {
      * @param isUserAction
      * @param extraParameters
      * @return Formatted payload for the WebHook to send for the responsibleChanged event.
+     * @throws WebHookPayloadContentAssemblyException 
      */
     String responsibleChanged(@NotNull SBuildType sBuildType, 
     		@NotNull ResponsibilityInfo responsibilityInfoOld, 
     		@NotNull ResponsibilityInfo responsibilityInfoNew, 
-    		boolean isUserAction, SortedMap<String,String> extraParameters, Map<String, String> templates);
+    		boolean isUserAction, SortedMap<String,String> extraParameters, Map<String, String> templates) throws WebHookPayloadContentAssemblyException;
 
     /**
      * Used by TC 7.x and above
@@ -141,11 +148,12 @@ public interface WebHookPayload {
      * @param responsibilityEntryNew
      * @param params
      * @return Formatted payload for the WebHook to send for the responsibleChanged event.
+     * @throws WebHookPayloadContentAssemblyException 
      */
 	String responsibleChanged(SBuildType sBuildType,
 			ResponsibilityEntry responsibilityEntryOld,
 			ResponsibilityEntry responsibilityEntryNew,
-			SortedMap<String,String> extraParameters, Map<String, String> templates); 
+			SortedMap<String,String> extraParameters, Map<String, String> templates) throws WebHookPayloadContentAssemblyException; 
     
 	/**
 	 * Gets the content type of the format.

@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import webhook.WebHook;
 import webhook.teamcity.payload.WebHookPayload;
 import webhook.teamcity.payload.WebHookPayloadManager;
+import webhook.teamcity.payload.content.WebHookPayloadContentAssemblyException;
 import webhook.teamcity.settings.WebHookConfig;
 import webhook.teamcity.settings.WebHookMainSettings;
 import webhook.teamcity.settings.WebHookProjectSettings;
@@ -99,25 +100,30 @@ public class WebHookListener extends BuildServerAdapter {
 				WebHookPayload payloadFormat = myManager.getFormat(whcw.whc.getPayloadFormat());
 				whcw.wh.setContentType(payloadFormat.getContentType());
 				
-				if (state.equals(BuildStateEnum.BUILD_STARTED)){
-					whcw.wh.setPayload(payloadFormat.buildStarted(sRunningBuild, getPreviousNonPersonalBuild(sRunningBuild), mergeParameters(whcw.whc.getParams(),sRunningBuild), whcw.whc.getEnabledTemplates()));
-					whcw.wh.setEnabled(whcw.whc.isEnabledForBuildType(sRunningBuild.getBuildType()) && whcw.wh.getBuildStates().enabled(BuildStateEnum.BUILD_STARTED));
-				} else if (state.equals(BuildStateEnum.BUILD_INTERRUPTED)){
-					whcw.wh.setPayload(payloadFormat.buildInterrupted(sRunningBuild, getPreviousNonPersonalBuild(sRunningBuild), mergeParameters(whcw.whc.getParams(),sRunningBuild), whcw.whc.getEnabledTemplates()));
-					whcw.wh.setEnabled(whcw.whc.isEnabledForBuildType(sRunningBuild.getBuildType()) && whcw.wh.getBuildStates().enabled(BuildStateEnum.BUILD_INTERRUPTED));
-				} else if (state.equals(BuildStateEnum.BEFORE_BUILD_FINISHED)){
-					whcw.wh.setPayload(payloadFormat.beforeBuildFinish(sRunningBuild, getPreviousNonPersonalBuild(sRunningBuild), mergeParameters(whcw.whc.getParams(),sRunningBuild), whcw.whc.getEnabledTemplates()));
-					whcw.wh.setEnabled(whcw.whc.isEnabledForBuildType(sRunningBuild.getBuildType()) && whcw.wh.getBuildStates().enabled(BuildStateEnum.BEFORE_BUILD_FINISHED));
-				} else if (state.equals(BuildStateEnum.BUILD_FINISHED)){
-					whcw.wh.setEnabled(whcw.whc.isEnabledForBuildType(sRunningBuild.getBuildType()) && whcw.wh.getBuildStates().enabled(
-							BuildStateEnum.BUILD_FINISHED, 
-							sRunningBuild.getStatusDescriptor().isSuccessful(),
-							this.hasBuildChangedHistoricalState(sRunningBuild)));
-					whcw.wh.setPayload(payloadFormat.buildFinished(sRunningBuild, getPreviousNonPersonalBuild(sRunningBuild), mergeParameters(whcw.whc.getParams(),sRunningBuild), whcw.whc.getEnabledTemplates()));;
-				}
+				try {
+					if (state.equals(BuildStateEnum.BUILD_STARTED)){
+						whcw.wh.setPayload(payloadFormat.buildStarted(sRunningBuild, getPreviousNonPersonalBuild(sRunningBuild), mergeParameters(whcw.whc.getParams(),sRunningBuild), whcw.whc.getEnabledTemplates()));
+						whcw.wh.setEnabled(whcw.whc.isEnabledForBuildType(sRunningBuild.getBuildType()) && whcw.wh.getBuildStates().enabled(BuildStateEnum.BUILD_STARTED));
+					} else if (state.equals(BuildStateEnum.BUILD_INTERRUPTED)){
+						whcw.wh.setPayload(payloadFormat.buildInterrupted(sRunningBuild, getPreviousNonPersonalBuild(sRunningBuild), mergeParameters(whcw.whc.getParams(),sRunningBuild), whcw.whc.getEnabledTemplates()));
+						whcw.wh.setEnabled(whcw.whc.isEnabledForBuildType(sRunningBuild.getBuildType()) && whcw.wh.getBuildStates().enabled(BuildStateEnum.BUILD_INTERRUPTED));
+					} else if (state.equals(BuildStateEnum.BEFORE_BUILD_FINISHED)){
+						whcw.wh.setPayload(payloadFormat.beforeBuildFinish(sRunningBuild, getPreviousNonPersonalBuild(sRunningBuild), mergeParameters(whcw.whc.getParams(),sRunningBuild), whcw.whc.getEnabledTemplates()));
+						whcw.wh.setEnabled(whcw.whc.isEnabledForBuildType(sRunningBuild.getBuildType()) && whcw.wh.getBuildStates().enabled(BuildStateEnum.BEFORE_BUILD_FINISHED));
+					} else if (state.equals(BuildStateEnum.BUILD_FINISHED)){
+						whcw.wh.setEnabled(whcw.whc.isEnabledForBuildType(sRunningBuild.getBuildType()) && whcw.wh.getBuildStates().enabled(
+								BuildStateEnum.BUILD_FINISHED, 
+								sRunningBuild.getStatusDescriptor().isSuccessful(),
+								this.hasBuildChangedHistoricalState(sRunningBuild)));
+						whcw.wh.setPayload(payloadFormat.buildFinished(sRunningBuild, getPreviousNonPersonalBuild(sRunningBuild), mergeParameters(whcw.whc.getParams(),sRunningBuild), whcw.whc.getEnabledTemplates()));;
+					}
 				
-				doPost(whcw.wh, whcw.whc.getPayloadFormat());
-				Loggers.ACTIVITIES.debug("WebHookListener :: " + myManager.getFormat(whcw.whc.getPayloadFormat()).getFormatDescription());
+					doPost(whcw.wh, whcw.whc.getPayloadFormat());
+					Loggers.ACTIVITIES.debug("WebHookListener :: " + myManager.getFormat(whcw.whc.getPayloadFormat()).getFormatDescription());
+				} catch (WebHookPayloadContentAssemblyException ex){
+					Loggers.SERVER.error(ex.getMessage());
+					Loggers.SERVER.debug(ex);
+				}
 	    	}
 	}
 
@@ -204,6 +210,7 @@ public class WebHookListener extends BuildServerAdapter {
 		Loggers.SERVER.debug("About to process WebHooks for " + sBuildType.getProjectId() + " at buildState responsibilityChanged");
 		for (WebHookConfigWrapper whcw : getListOfEnabledWebHooks(sBuildType.getProjectId())){
 
+					try {
 						WebHookPayload payloadFormat = myManager.getFormat(whcw.whc.getPayloadFormat());
 						whcw.wh.setContentType(payloadFormat.getContentType());
 						whcw.wh.setPayload(payloadFormat.responsibleChanged(sBuildType, 
@@ -214,6 +221,11 @@ public class WebHookListener extends BuildServerAdapter {
 						whcw.wh.setEnabled(whcw.whc.isEnabledForBuildType(sBuildType) && whcw.wh.getBuildStates().enabled(BuildStateEnum.RESPONSIBILITY_CHANGED));
 						doPost(whcw.wh, whcw.whc.getPayloadFormat());
 						Loggers.ACTIVITIES.debug("WebHookListener :: " + myManager.getFormat(whcw.whc.getPayloadFormat()).getFormatDescription());
+						
+					} catch (WebHookPayloadContentAssemblyException ex){
+						Loggers.SERVER.error(ex.getMessage());
+						Loggers.SERVER.debug(ex);
+					}
 		}
      }
 
@@ -272,6 +284,8 @@ public class WebHookListener extends BuildServerAdapter {
 		for (WebHookConfigWrapper whcw : getListOfEnabledWebHooks(sBuildType.getProjectId())){
 						WebHookPayload payloadFormat = myManager.getFormat(whcw.whc.getPayloadFormat());
 						whcw.wh.setContentType(payloadFormat.getContentType());
+						
+					try{
 						whcw.wh.setPayload(payloadFormat.responsibleChanged(sBuildType, 
 									responsibilityEntryOld, 
 									responsibilityEntryNew, 
@@ -279,6 +293,10 @@ public class WebHookListener extends BuildServerAdapter {
 						whcw.wh.setEnabled(whcw.whc.isEnabledForBuildType(sBuildType) && whcw.wh.getBuildStates().enabled(BuildStateEnum.RESPONSIBILITY_CHANGED));
 						doPost(whcw.wh, whcw.whc.getPayloadFormat());
 						Loggers.ACTIVITIES.debug("WebHookListener :: " + myManager.getFormat(whcw.whc.getPayloadFormat()).getFormatDescription());
+					} catch (WebHookPayloadContentAssemblyException ex){
+						Loggers.SERVER.error(ex.getMessage());
+						Loggers.SERVER.debug(ex);
+					}						
      	}
 	}
 	
