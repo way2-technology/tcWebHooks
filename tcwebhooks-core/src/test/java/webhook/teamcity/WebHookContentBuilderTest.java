@@ -42,6 +42,7 @@ public class WebHookContentBuilderTest {
 	MockSProject sProject = new MockSProject("Test Project", "A test project", "project1", "ATestProject", sBuildType);
 	BuildHistory buildHistory = mock(BuildHistory.class);
 	SBuildServer server = mock(SBuildServer.class);
+	WebHookTemplateJaxHelper webHookTemplateJaxHelper = mock(WebHookTemplateJaxHelper.class);
 
 	@Before
 	public void setUp() throws Exception {
@@ -60,7 +61,7 @@ public class WebHookContentBuilderTest {
 		WebHookPayloadManager manager = new WebHookPayloadManager(server);
 		WebHookPayloadJson whp = new WebHookPayloadJson(manager);
 		whp.register();
-		WebHookTemplateManager webHookTemplateManager = new WebHookTemplateManager(manager);
+		WebHookTemplateManager webHookTemplateManager = new WebHookTemplateManager(manager, webHookTemplateJaxHelper);
 		WebHookTemplateResolver resolver = new WebHookTemplateResolver(webHookTemplateManager);
 		WebHookContentBuilder builder = new WebHookContentBuilder(server, manager, resolver);
 		WebHook wh = new WebHookImpl();
