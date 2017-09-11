@@ -270,3 +270,158 @@ div.extraAuthParametersWrapper {
 	padding: 2em;
 	padding-top: 0.5em;
 } 
+
+table#webhookTemplateHeader {
+	margin-top:1em;
+}
+
+table#webhookTemplateHeader th {
+	text-alight:right;
+}
+
+table#webhookTemplateHeader, table#webhookTemplateHeader tr, table#webhookTemplateHeader th, table#webhookTemplateHeader td {
+	border: none;
+}
+
+table.templateTable {
+	border:none;
+}
+
+table.templateTable td.buildTemplateAction {
+	padding-left:0;
+	text-align: center;
+	width:16%;
+}
+
+table.templateTable td {
+	padding-left: 2em;
+}
+
+table.templateTable th {
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+}
+
+table.templateTable tr {
+	border-left: 1px solid #ccc;
+}
+
+table.templateTable tr.blankline, table.templateTable tr.blankline td {
+	border-left: none;
+	border-right: none;
+	background: white;
+}
+	
+table.templateTable tr.templateHeading th {
+	text-align: left;
+	padding-left: 1.5em;
+	padding-top: 0.75em;
+	padding-bottom: 0.75em;
+	
+}
+
+table.templateTable tr td.templateTableBuildTitle {
+	font-weight: bold;
+	padding-top: 1.5em;
+	padding-bottom: 1.5em;
+	padding-left: 1em;
+}
+
+tr.templateHeading {
+	background-color: rgb(245, 245, 245);
+}
+
+#repoDeleteFilterDialogSubmit, #deleteRepoDialogSubmit {
+	background-color: red;
+	background-image: linear-gradient(to bottom, #e06667, #e50000);
+}
+
+table.templateTable tr td.templateTableTemplateTitle {
+	font-weight: bold;
+	padding-top: 1.5em;
+	padding-bottom: 1.5em;
+	padding-left: 1em;
+}
+
+ul.templateBuildStates {
+  display: inline;
+  list-style: none;
+  padding:0;
+}
+
+ul.templateBuildStates li {
+  display: inline;
+}
+
+ul.templateBuildStates li:after {
+  content: ", ";
+}
+
+ul.templateBuildStates li:last-child:after {
+    content: "";
+}
+
+/*
+#editor { 
+    margin: 0;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}*/
+
+.editor {
+	width: 98%;
+	height: 28em;
+	margin:0px;
+	border-top: none;
+	border: 1px #ccc solid;
+}
+
+div#editTemplateDialog {
+	width: 80%;
+	min-width: 80em;
+	max-width: 1000px;
+}
+
+table.templateDialogFormTable {
+	width: 100%;
+    min-width: 48em;
+    margin-bottom: 6px;
+    table-layout: fixed;
+}
+
+table.templateDialogFormTable label {
+	cursor: pointer;
+}
+
+table.templateDialogFormTable label.checkboxLooksDisabled {
+	color: #999;
+	cursor: not-allowed;
+}
+
+div#templateVariables {
+	float: right;
+	width: 30%;
+}
+
+div#templateEditor {
+	width: 70%;
+}
+
+
+div#templateEditor ul.etabs {
+	padding: 0px;
+	margin-left: 3em;
+	margin-top: 1.25em;
+}
+
+/*
+div#templateEditor ul.etabs li {
+	border-bottom: solid 1px #999;
+}
+
+div#templateEditor .etabs .tab.active {
+	border-bottom: none;
+}*/
