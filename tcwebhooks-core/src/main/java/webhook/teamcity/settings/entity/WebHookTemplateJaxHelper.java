@@ -34,4 +34,4 @@ public interface WebHookTemplateJaxHelper {
 	public abstract void write(WebHookTemplates templates, String configFilePath)
 			throws JAXBException;
 
-	}
+}
