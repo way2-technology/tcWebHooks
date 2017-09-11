@@ -203,8 +203,8 @@ public class WebHookTemplateFromXml implements WebHookPayloadTemplate {
 						BuildStateEnum bse =  BuildStateEnum.findBuildState(state.getType());
 						if (bse != null){
 								if (item.getTemplateText() != null && item.getTemplateText().isUseTemplateTextForBranch()){
-							template.addBranchTemplateContentForState(bse, WebHookTemplateContent.create(
-									bse.getShortName(), 
+									template.addBranchTemplateContentForState(bse, WebHookTemplateContent.create(
+											bse.getShortName(), 
 											item.getTemplateText().getTemplateContent(),
 											true,
 											template.getPreferredDateTimeFormat()));
@@ -214,11 +214,11 @@ public class WebHookTemplateFromXml implements WebHookPayloadTemplate {
 											item.getBranchTemplateText().getTemplateContent(),
 									true,
 									template.getPreferredDateTimeFormat()));
+								}
+							}
 						}
 					}
 				}
-			}
-		}
 			}
 		} // End if entityTemplate.getTemplates() != null
 		
