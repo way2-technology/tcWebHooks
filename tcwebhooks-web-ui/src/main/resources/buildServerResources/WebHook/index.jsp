@@ -359,7 +359,6 @@
 		                backgroundColor: "#ffffff"
 		            }, 1500 );
 				}
-				console.log("Adding webhook with uniqueId" + webhook.uniqueKey);
 			});
 			
 			jQueryWebhook('#currentTemplateBuildId').empty();
