@@ -1,10 +1,17 @@
 package webhook.teamcity.payload.template;
 
-import webhook.teamcity.payload.WebHookTemplate;
+import java.util.List;
+
+import webhook.teamcity.payload.WebHookPayloadTemplate;
 import webhook.teamcity.payload.WebHookTemplateManager;
 import webhook.teamcity.payload.format.WebHookPayloadJsonTemplate;
+import webhook.teamcity.settings.entity.WebHookTemplateEntity;
+import webhook.teamcity.settings.entity.WebHookTemplateEntity.WebHookTemplateBranchText;
+import webhook.teamcity.settings.entity.WebHookTemplateEntity.WebHookTemplateFormat;
+import webhook.teamcity.settings.entity.WebHookTemplateEntity.WebHookTemplateItems;
+import webhook.teamcity.settings.entity.WebHookTemplateEntity.WebHookTemplateText;
 
-public class ElasticSearchWebHookTemplate extends AbstractPropertiesBasedWebHookTemplate implements WebHookTemplate {
+public class ElasticSearchWebHookTemplate extends AbstractPropertiesBasedWebHookTemplate implements WebHookPayloadTemplate {
 	
 	public ElasticSearchWebHookTemplate(WebHookTemplateManager manager) {
 		super(manager);
@@ -19,7 +26,7 @@ public class ElasticSearchWebHookTemplate extends AbstractPropertiesBasedWebHook
 	}
 
 	@Override
-	public String getTemplateToolTipText() {
+	public String getTemplateToolTip() {
 		return "Creates document in Elastic Search index";
 	}
 

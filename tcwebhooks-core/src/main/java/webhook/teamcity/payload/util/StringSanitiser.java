@@ -26,4 +26,8 @@ public class StringSanitiser {
 				;
 	}
  
+	public static String sanitize(String dirtyString){
+		return sanitise(dirtyString);
+	}
+ 
 }

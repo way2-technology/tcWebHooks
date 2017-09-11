@@ -8,30 +8,38 @@ import java.util.Set;
 
 import webhook.teamcity.BuildStateEnum;
 import webhook.teamcity.payload.WebHookPayloadManager;
-import webhook.teamcity.payload.WebHookTemplate;
+import webhook.teamcity.payload.WebHookPayloadTemplate;
 import webhook.teamcity.payload.WebHookTemplateContent;
 import webhook.teamcity.payload.WebHookTemplateManager;
+import webhook.teamcity.settings.config.WebHookTemplateConfig;
+import webhook.teamcity.settings.config.builder.WebHookTemplateConfigBuilder;
+import webhook.teamcity.settings.entity.WebHookTemplateEntity;
+import webhook.teamcity.settings.entity.WebHookTemplateEntity.WebHookTemplateBranchText;
+import webhook.teamcity.settings.entity.WebHookTemplateEntity.WebHookTemplateFormat;
+import webhook.teamcity.settings.entity.WebHookTemplateEntity.WebHookTemplateItems;
+import webhook.teamcity.settings.entity.WebHookTemplateEntity.WebHookTemplateText;
 
-public class WebHookTemplateFromXml implements WebHookTemplate {
+public class WebHookTemplateFromXml implements WebHookPayloadTemplate {
 	
 	List<String> supportedFormats = new ArrayList<>();
 	Map<BuildStateEnum,WebHookTemplateContent> templateContent = new HashMap<>();
 	Map<BuildStateEnum,WebHookTemplateContent> branchTemplateContent = new HashMap<>();
 	
-	protected WebHookTemplateManager manager;
+	protected WebHookTemplateManager templateManager;
 	private int rank = 10; // Default to 10.
 	private String shortName = "";
 	private String toolTipText = "";
 	private String description = "";
 	private String preferredDateTimeFormat = "";
+	private WebHookTemplateEntity entity;
 
 	@Override
 	public void setTemplateManager(WebHookTemplateManager webhookTemplateManager) {
-		this.manager = webhookTemplateManager;
+		this.templateManager = webhookTemplateManager;
 	}
 
 	@Override
-	public Integer getRank() {
+	public int getRank() {
 		return rank;
 	}
 
@@ -62,7 +70,7 @@ public class WebHookTemplateFromXml implements WebHookTemplate {
 	}
 
 	@Override
-	public String getTemplateToolTipText() {
+	public String getTemplateToolTip() {
 		return this.toolTipText;
 	}
 	
@@ -113,11 +121,12 @@ public class WebHookTemplateFromXml implements WebHookTemplate {
 		this.branchTemplateContent.put(state, content);
 	}
 
-	public static WebHookTemplate build(
-			webhook.teamcity.settings.entity.WebHookTemplate entityTemplate,
+	public static WebHookPayloadTemplate build(
+			WebHookTemplateEntity entityTemplate,
 			WebHookPayloadManager payloadManager
 			) {
 		WebHookTemplateFromXml template = new WebHookTemplateFromXml();
+		template.entity = entityTemplate;
 		template.setRank(entityTemplate.getRank());
 		template.setTemplateShortName(entityTemplate.getName());
 		template.setPreferredDateTimeFormat(entityTemplate.getPreferredDateTimeFormat());
@@ -141,7 +150,7 @@ public class WebHookTemplateFromXml implements WebHookTemplate {
 				
 				template.addTemplateContentForState(state, WebHookTemplateContent.create(
 						state.getShortName(), 
-						entityTemplate.getDefaultTemplate(),
+						entityTemplate.getDefaultTemplate().getTemplateContent(),
 						true,
 						template.getPreferredDateTimeFormat()));
 				
@@ -150,27 +159,34 @@ public class WebHookTemplateFromXml implements WebHookTemplate {
 		
 		// If a default branch template is set, populate all BuildStates with it.
 		// We will override later if we find a buildState specific one. 
-		if (entityTemplate.getDefaultBranchTemplate() != null){
+		if ((entityTemplate.getDefaultTemplate() != null && entityTemplate.getDefaultTemplate().isUseTemplateTextForBranch()) || entityTemplate.getDefaultBranchTemplate() != null){
 			for (BuildStateEnum state : BuildStateEnum.getNotifyStates()){
-				
+				if (entityTemplate.getDefaultTemplate().isUseTemplateTextForBranch()){
+					template.addBranchTemplateContentForState(state, WebHookTemplateContent.create(
+							state.getShortName(), 
+							entityTemplate.getDefaultTemplate().getTemplateContent(),
+							true,
+							template.getPreferredDateTimeFormat()));
+				} else {
 				template.addBranchTemplateContentForState(state, WebHookTemplateContent.create(
 						state.getShortName(), 
-						entityTemplate.getDefaultBranchTemplate(),
+							entityTemplate.getDefaultBranchTemplate().getTemplateContent(),
 						true,
 						template.getPreferredDateTimeFormat()));
 				
 			}
 		}
-		
-		for (webhook.teamcity.settings.entity.WebHookTemplate.WebHookTemplateItem item : entityTemplate.getTemplates()){
+		}
+		if (entityTemplate.getTemplates() != null){
+			for (webhook.teamcity.settings.entity.WebHookTemplateEntity.WebHookTemplateItem item : entityTemplate.getTemplates().getTemplates()){
 			if (item.isEnabled() && item.getTemplateText()!= null){
-				for (webhook.teamcity.settings.entity.WebHookTemplate.WebHookTemplateState state :item.getStates()){
+					for (webhook.teamcity.settings.entity.WebHookTemplateEntity.WebHookTemplateState state :item.getStates()){
 					if (state.isEnabled()){
 						BuildStateEnum bse =  BuildStateEnum.findBuildState(state.getType());
 						if (bse != null){
 							template.addTemplateContentForState(bse, WebHookTemplateContent.create(
 									bse.getShortName(), 
-									item.getTemplateText(),
+										item.getTemplateText().getTemplateContent(),
 									true,
 									template.getPreferredDateTimeFormat()
 									));
@@ -180,15 +196,22 @@ public class WebHookTemplateFromXml implements WebHookTemplate {
 			}
 		}
 		
-		for (webhook.teamcity.settings.entity.WebHookTemplate.WebHookTemplateItem item : entityTemplate.getTemplates()){
-			if (item.isEnabled() && item.getBranchTemplateText()!= null){
-				for (webhook.teamcity.settings.entity.WebHookTemplate.WebHookTemplateState state :item.getStates()){
+			for (webhook.teamcity.settings.entity.WebHookTemplateEntity.WebHookTemplateItem item : entityTemplate.getTemplates().getTemplates()){
+				if (item.isEnabled() && ((item.getTemplateText()!= null && item.getTemplateText().isUseTemplateTextForBranch()) || item.getBranchTemplateText()!= null)){
+					for (webhook.teamcity.settings.entity.WebHookTemplateEntity.WebHookTemplateState state :item.getStates()){
 					if (state.isEnabled()){
 						BuildStateEnum bse =  BuildStateEnum.findBuildState(state.getType());
 						if (bse != null){
+								if (item.getTemplateText() != null && item.getTemplateText().isUseTemplateTextForBranch()){
 							template.addBranchTemplateContentForState(bse, WebHookTemplateContent.create(
 									bse.getShortName(), 
-									item.getBranchTemplateText(),
+											item.getTemplateText().getTemplateContent(),
+											true,
+											template.getPreferredDateTimeFormat()));
+								} else {
+									template.addBranchTemplateContentForState(bse, WebHookTemplateContent.create(
+											bse.getShortName(), 
+											item.getBranchTemplateText().getTemplateContent(),
 									true,
 									template.getPreferredDateTimeFormat()));
 						}
@@ -196,12 +219,12 @@ public class WebHookTemplateFromXml implements WebHookTemplate {
 				}
 			}
 		}
-		
-		for (webhook.teamcity.settings.entity.WebHookTemplate.WebHookTemplateFormat format : entityTemplate.getFormats()){
-			if (format.isEnabled() && payloadManager.isRegisteredFormat(format.getName())){
-				template.supportedFormats.add(format.getName());
 			}
-		}
+		} // End if entityTemplate.getTemplates() != null
+		
+		if (entityTemplate.getFormat() != null && payloadManager.isRegisteredFormat(entityTemplate.getFormat())){
+			template.supportedFormats.add(entityTemplate.getFormat());
+			}
 		return template;
 	}
 	
@@ -224,5 +247,21 @@ public class WebHookTemplateFromXml implements WebHookTemplate {
 	public String getPreferredDateTimeFormat() {
 		return this.preferredDateTimeFormat;
 	}
+
+	public void persist(){
+		
+	}
+
+	@Override
+	public WebHookTemplateEntity getAsEntity() {
+		return entity;
+	}
+
+	@Override
+	public WebHookTemplateConfig getAsConfig() {
+		return WebHookTemplateConfigBuilder.buildConfig(getAsEntity());
+	}
+
+
 
 }

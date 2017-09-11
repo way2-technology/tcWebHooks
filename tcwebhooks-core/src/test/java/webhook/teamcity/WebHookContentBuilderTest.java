@@ -29,6 +29,7 @@ import webhook.teamcity.payload.WebHookTemplateResolver;
 import webhook.teamcity.payload.content.WebHookPayloadContentAssemblyException;
 import webhook.teamcity.payload.format.WebHookPayloadJson;
 import webhook.teamcity.settings.WebHookConfig;
+import webhook.teamcity.settings.entity.WebHookTemplateJaxHelper;
 
 public class WebHookContentBuilderTest {
 	

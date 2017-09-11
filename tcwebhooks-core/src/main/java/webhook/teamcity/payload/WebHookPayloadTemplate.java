@@ -3,8 +3,10 @@ package webhook.teamcity.payload;
 import java.util.Set;
 
 import webhook.teamcity.BuildStateEnum;
+import webhook.teamcity.settings.config.WebHookTemplateConfig;
+import webhook.teamcity.settings.entity.WebHookTemplateEntity;
 
-public interface WebHookTemplate {
+public interface WebHookPayloadTemplate {
 
 	/** 
 	 * Sets the TemplateManager so that register() can register this template with that webHookTemplateManager.
@@ -36,7 +38,7 @@ public interface WebHookTemplate {
 	 *  
 	 * @return	Tool Tip Text for display on the WebHook config page.
 	 */
-	String getTemplateToolTipText();
+	String getTemplateToolTip();
 	
 	/**
 	 * Returns a short name for the template type. This string is used in the HTML form when 
@@ -65,7 +67,7 @@ public interface WebHookTemplate {
      * 
      * @return rank (higher numbers are ranked first)
      */
-    Integer getRank();
+    int getRank();
     
     /**
      * Set in Integer for order. The Higher the number, the more likely 
@@ -131,6 +133,8 @@ public interface WebHookTemplate {
 	 * 
 	 */
 	String getPreferredDateTimeFormat();
-		
-
+	
+	WebHookTemplateEntity getAsEntity();
+	
+	WebHookTemplateConfig getAsConfig();
 }
