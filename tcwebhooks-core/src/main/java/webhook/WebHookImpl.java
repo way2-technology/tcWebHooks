@@ -48,26 +48,31 @@ public class WebHookImpl implements WebHook {
 	private BuildState states;
 	private WebHookAuthenticator authenticator;
 	private List<WebHookFilterConfig> filters;
+	private WebHookExecutionStats webhookStats;
 	private SFinishedBuild previousSFinishedBuild;
 	
 	
 	public WebHookImpl(){
+		this.webhookStats = new WebHookExecutionStats();
 		this.client = new HttpClient();
 		this.params = new ArrayList<>();
 	}
 	
 	protected WebHookImpl(HttpClient client){
+		this.webhookStats = new WebHookExecutionStats();
 		this.client = client;
 		this.params = new ArrayList<>();
 	}
 	
 	public WebHookImpl(String url, HttpClient client){
+		this.webhookStats = new WebHookExecutionStats();
 		this.url = url;
 		this.client = client;
 		this.params = new ArrayList<>();
 	}
 	
 	public WebHookImpl (String url, String proxyHost, String proxyPort, HttpClient client){
+		this.webhookStats = new WebHookExecutionStats();
 		this.url = url;
 		this.client = client;
 		this.params = new ArrayList<>();
@@ -82,6 +87,7 @@ public class WebHookImpl implements WebHook {
 	}
 	
 	public WebHookImpl (String url, String proxyHost, Integer proxyPort, HttpClient client){
+		this.webhookStats = new WebHookExecutionStats();
 		this.url = url;
 		this.client = client;
 		this.params = new ArrayList<>();
@@ -89,6 +95,7 @@ public class WebHookImpl implements WebHook {
 	}
 	
 	public WebHookImpl (String url, WebHookProxyConfig proxyConfig, HttpClient client){
+		this.webhookStats = new WebHookExecutionStats();
 		this.url = url;
 		this.client = client;
 		this.params = new ArrayList<>();
@@ -142,15 +149,21 @@ public class WebHookImpl implements WebHook {
 			if(authenticator != null){
 				authenticator.addAuthentication(httppost, client, url);
 			}
-				
+			
+			this.webhookStats.setUrl(this.url);
+			
 		    try {
+		    	this.webhookStats.setRequestStarting();
 		    	Loggers.SERVER.debug("WebHookImpl::  Connect timeout(millis): " + this.client.getHttpConnectionManager().getParams().getConnectionTimeout());
 		    	Loggers.SERVER.debug("WebHookImpl:: Response timeout(millis): " + this.client.getHttpConnectionManager().getParams().getSoTimeout());
 		        client.executeMethod(httppost);
+		        this.webhookStats.setRequestCompleted(httppost.getStatusCode());
 		        this.resultCode = httppost.getStatusCode();
 		        this.content = httppost.getResponseBodyAsString();
+		        this.webhookStats.setHeaders(httppost.getResponseHeaders());
 		    } finally {
 		        httppost.releaseConnection();
+		        this.webhookStats.setTeardownCompleted();
 		    }   
 		}
 	}
@@ -376,6 +389,11 @@ public class WebHookImpl implements WebHook {
 	@Override
 	public String getDisabledReason() {
 		return disabledReason;
+	}
+
+	@Override
+	public WebHookExecutionStats getExecutionStats() {
+		return this.webhookStats;
 	}
 
 	@Override
