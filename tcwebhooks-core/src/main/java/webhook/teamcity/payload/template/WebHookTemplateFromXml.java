@@ -170,7 +170,7 @@ public class WebHookTemplateFromXml implements WebHookPayloadTemplate {
 				} else {
 				template.addBranchTemplateContentForState(state, WebHookTemplateContent.create(
 						state.getShortName(), 
-							entityTemplate.getDefaultBranchTemplate().getTemplateContent(),
+						entityTemplate.getDefaultBranchTemplate().getTemplateContent(),
 						true,
 						template.getPreferredDateTimeFormat()));
 				
@@ -186,7 +186,7 @@ public class WebHookTemplateFromXml implements WebHookPayloadTemplate {
 						if (bse != null){
 							template.addTemplateContentForState(bse, WebHookTemplateContent.create(
 									bse.getShortName(), 
-										item.getTemplateText().getTemplateContent(),
+									item.getTemplateText().getTemplateContent(),
 									true,
 									template.getPreferredDateTimeFormat()
 									));

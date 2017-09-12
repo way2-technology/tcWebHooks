@@ -62,16 +62,15 @@ public class WebHookTemplateEditPageController extends BaseController {
 	    	params.put("includeJquery", Boolean.toString(this.myServer.getServerMajorVersion() < 7));
 	    	params.put("rootContext", myServer.getServerRootPath());
 	    	
-	    		
-	    		
+	    	
+	    	
 	    	if (request.getParameter(GET_VARIABLE_NAME_TEMPLATE) != null){
-	    			
+	    		
     			String templateName = request.getParameter(GET_VARIABLE_NAME_TEMPLATE).toString();
     			if (templateName != null) {
     				WebHookTemplateConfig templateConfig = myTemplateManager.getTemplateConfig(templateName);
     				params.put("webhookTemplateBean", EditTemplateRenderingBean.build(templateConfig));
 	    		}
-	    		
 	    		
 	    	}
 	    	

@@ -77,7 +77,7 @@ public class WebHookTemplateManager {
 			}
 		}
 	}
-
+	
 	public boolean persistAllXmlConfigTemplates(){
 		synchronized (orderedTemplateCollection) {
 			WebHookTemplates templates = new WebHookTemplates();

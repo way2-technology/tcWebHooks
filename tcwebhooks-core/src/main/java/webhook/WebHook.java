@@ -96,7 +96,7 @@ public interface WebHook {
 
 	public abstract String getDisabledReason();
 
-	public abstract WebHookExecutionStats getExecutionStats();	
+	public abstract WebHookExecutionStats getExecutionStats();
 
 	public abstract SFinishedBuild getPreviousNonPersonalBuild();
 

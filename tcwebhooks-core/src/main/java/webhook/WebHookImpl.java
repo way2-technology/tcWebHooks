@@ -19,7 +19,6 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 
 import jetbrains.buildServer.serverSide.SFinishedBuild;
 import webhook.teamcity.BuildState;
-
 import webhook.teamcity.Loggers;
 import webhook.teamcity.auth.WebHookAuthenticator;
 import webhook.teamcity.payload.util.TemplateMatcher.VariableResolver;
